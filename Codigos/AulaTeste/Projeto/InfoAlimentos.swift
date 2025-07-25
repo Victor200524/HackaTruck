@@ -14,6 +14,10 @@ struct InfoAlimentos: View {
     @State private var animateRectangule = false
     @State private var animateText = false
     
+    @State var sheetDown = false
+    @State private var selectedId: UUID? = nil
+    @State private var showNotification = false
+    
     @StateObject var foods = ViewModelAlimentos()
     
     // Formata a data para "25 de julho de 2025"
@@ -67,9 +71,7 @@ struct InfoAlimentos: View {
                         .bold()
                         .offset(x: animateDate ? 0 : -UIScreen.main.bounds.width)
                         .animation(.easeOut(duration: 1), value: animateDate)
-                        .onAppear {
-                            animateDate = true
-                        }
+                        .onAppear { animateDate = true }
                         .padding()
                     
                     if alimentosDoDia.isEmpty {
@@ -85,27 +87,25 @@ struct InfoAlimentos: View {
                                 .font(.title)
                                 .offset(x: animateKcal ? 0 : -UIScreen.main.bounds.width)
                                 .animation(.easeOut(duration: 1), value: animateKcal)
-                                .onAppear {
-                                    animateKcal = true
-                                }
+                                .onAppear { animateKcal = true }
                         }
                         .frame(maxWidth: .infinity, alignment: .trailing)
                         .padding()
                         
                         ScrollView(.vertical) {
                             ForEach(alimentosDoDia, id: \.id) { info in
-                                // Aqui o seu layout para exibir cada alimento, igual antes
                                 ZStack {
-                                    Rectangle()
-                                        .frame(width: 360, height: 60)
-                                        .foregroundColor(.green)
-                                        .opacity(0.4)
-                                        .offset(x: animateRectangule ? 0 : -UIScreen.main.bounds.width)
-                                        .animation(.easeOut(duration: 1), value: animateRectangule)
-                                        .onAppear {
-                                            animateRectangule = true
-                                        }
-                                    
+                                    Button(action: {
+                                        botaoAlimentoAction(id: info.id)
+                                    }) {
+                                        Rectangle()
+                                            .frame(width: 360, height: 60)
+                                            .foregroundColor(.green)
+                                            .opacity(0.4)
+                                            .offset(x: animateRectangule ? 0 : -UIScreen.main.bounds.width)
+                                            .animation(.easeOut(duration: 1), value: animateRectangule)
+                                            .onAppear { animateRectangule = true }
+                                    }
                                     VStack {
                                         HStack {
                                             Image(systemName: "clock.fill")
@@ -114,18 +114,14 @@ struct InfoAlimentos: View {
                                                 .frame(width: 15, height: 15)
                                                 .offset(x: animateText ? 0 : -UIScreen.main.bounds.width)
                                                 .animation(.easeOut(duration: 1), value: animateText)
-                                                .onAppear {
-                                                    animateText = true
-                                                }
+                                                .onAppear { animateText = true }
                                             
                                             Text(info.horario ?? "")
                                                 .foregroundStyle(.black)
                                                 .bold()
                                                 .offset(x: animateText ? 0 : -UIScreen.main.bounds.width)
                                                 .animation(.easeOut(duration: 1), value: animateText)
-                                                .onAppear {
-                                                    animateText = true
-                                                }
+                                                .onAppear { animateText = true }
                                             
                                             Spacer().frame(width: 210)
                                             
@@ -134,9 +130,7 @@ struct InfoAlimentos: View {
                                                 .bold()
                                                 .offset(x: animateText ? 0 : -UIScreen.main.bounds.width)
                                                 .animation(.easeOut(duration: 1), value: animateText)
-                                                .onAppear {
-                                                    animateText = true
-                                                }
+                                                .onAppear { animateText = true }
                                         }
                                         Text(info.alimento ?? "")
                                             .foregroundStyle(.black)
@@ -144,9 +138,7 @@ struct InfoAlimentos: View {
                                             .frame(maxWidth: 350, alignment: .leading)
                                             .offset(x: animateText ? 0 : -UIScreen.main.bounds.width)
                                             .animation(.easeOut(duration: 1), value: animateText)
-                                            .onAppear {
-                                                animateText = true
-                                            }
+                                            .onAppear { animateText = true }
                                     }
                                 }
                             }
@@ -154,11 +146,28 @@ struct InfoAlimentos: View {
                     }
                 }
             }
+            if showNotification, let selectedId = selectedId {
+                MaisInfo(id: selectedId, alimentos: alimentosDoDia) {
+                    withAnimation {
+                        showNotification = false
+                    }
+                }
+                .transition(.move(edge: .top))
+                .zIndex(1)
+            }
         }
-        .onAppear() {
+        .onAppear {
             foods.fetch()
         }
     }
+    
+    func botaoAlimentoAction(id: UUID) {
+        selectedId = id
+        withAnimation {
+            showNotification = true
+        }
+    }
+
 }
 #Preview {
     InfoAlimentos(date: .constant(Date()))

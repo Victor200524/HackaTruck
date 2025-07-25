@@ -13,4 +13,7 @@ struct alimentacao: Decodable, Hashable{
     let horario: String?
     let calorias: Int?
     let alimento: String?
+    let proteina: Double?
+    let gordura: Double?
+    let carboidrato: Double?
 }

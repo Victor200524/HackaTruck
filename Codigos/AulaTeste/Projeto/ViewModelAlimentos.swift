@@ -11,35 +11,36 @@ class ViewModelAlimentos: ObservableObject {
     @Published var food: [alimentacao] = []
     @Published var isLoading = false
     
-    func fetch() {
-        guard let url = URL(string: "http://192.168.128.92:1880/alimentos") else {
+    func fetch(completion: (() -> Void)? = nil) {
+        isLoading = true
+        guard let url = URL(string: "http://127.0.0.1:1880/alimentos") else {
+            isLoading = false
+            completion?()
             return
-        }
-        
-        DispatchQueue.main.async {
-            self.isLoading = true
         }
 
         let task = URLSession.shared.dataTask(with: url) { [weak self] data, _, error in
             DispatchQueue.main.async {
-                self?.isLoading = false
-            }
-            
-            guard let data = data, error == nil else {
-                return
-            }
-
-            do {
-                let parsed = try JSONDecoder().decode([alimentacao].self, from: data)
-                DispatchQueue.main.async {
-                    self?.food = parsed
+                guard let data = data, error == nil else {
+                    self?.isLoading = false
+                    completion?()
+                    return
                 }
-            } catch {
-                print(error)
+
+                do {
+                    let parsed = try JSONDecoder().decode([alimentacao].self, from: data)
+                    self?.food = parsed
+                } catch {
+                    print(error)
+                }
+
+                self?.isLoading = false
+                completion?()
             }
         }
 
         task.resume()
     }
+
 }
 

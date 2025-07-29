@@ -44,9 +44,24 @@ struct InfoAlimentos: View {
     
     // Computed property que filtra os alimentos da data selecionada
     var alimentosDoDia: [alimentacao] {
-        foods.food.filter { info in
-            guard let dataRegistro = converterStringParaDate(info.data ?? "") else { return false }
+        let formatarData = DateFormatter()
+        formatarData.dateFormat = "HH:mm"
+        formatarData.locale = Locale(identifier: "en_US_POSIX")
+        
+        return foods.food.filter { info in
+            guard let dataRegistro = converterStringParaDate(info.data ?? "")
+            else{
+                return false
+            }
             return ehMesmaData(dataRegistro, date)
+        }.sorted{ a, b in
+            guard
+                let h1 = a.horario, let d1 = formatarData.date(from: h1),
+                let h2 = b.horario, let d2 = formatarData.date(from: h2)
+            else{
+                return false
+            }
+            return d1 < d2
         }
     }
     
@@ -94,12 +109,13 @@ struct InfoAlimentos: View {
                         
                         ScrollView(.vertical) {
                             ForEach(alimentosDoDia, id: \.id) { info in
+                                
                                 ZStack {
                                     Button(action: {
                                         botaoAlimentoAction(id: info.id)
                                     }) {
                                         Rectangle()
-                                            .frame(width: 360, height: 60)
+                                            .frame(width: 360, height: 70)
                                             .foregroundColor(.green)
                                             .opacity(0.4)
                                             .offset(x: animateRectangule ? 0 : -UIScreen.main.bounds.width)

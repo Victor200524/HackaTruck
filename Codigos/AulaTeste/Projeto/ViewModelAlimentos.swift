@@ -13,7 +13,7 @@ class ViewModelAlimentos: ObservableObject {
     
     func fetch(completion: (() -> Void)? = nil) {
         isLoading = true
-        guard let url = URL(string: "http://127.0.0.1:1880/alimentos") else {
+        guard let url = URL(string: "http://192.168.128.92:1880/alimentos") else {
             isLoading = false
             completion?()
             return

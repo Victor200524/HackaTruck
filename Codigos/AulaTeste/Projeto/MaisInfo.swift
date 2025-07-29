@@ -39,13 +39,13 @@ struct MaisInfo: View {
                 
                 Divider()
                 
-                Text("🔥 Calorias: \(alimento.calorias ?? 0) kcal")
-                Text(String(format: "🥩 Proteína: %.1f g", alimento.proteina ?? 0.0))
-                Text(String(format: "🥑 Gordura: %.1f g", alimento.gordura ?? 0.0))
-                Text(String(format: "🍞 Carboidrato: %.1f g", alimento.carboidrato ?? 0.0))
+                Text("🔥 Calorias: \(alimento.calorias ?? 0) kcal").foregroundStyle(.blue).bold()
+                Text(String(format: "🥩 Proteína: %.1f g", alimento.proteina ?? 0.0)).foregroundStyle(.yellow).bold()
+                Text(String(format: "🥑 Gordura: %.1f g", alimento.gordura ?? 0.0)).foregroundStyle(.red).bold()
+                Text(String(format: "🍞 Carboidrato: %.1f g", alimento.carboidrato ?? 0.0)).foregroundStyle(.orange).bold()
             } else {
                 Text("Alimento não encontrado")
-                    .foregroundColor(.red)
+                    .foregroundColor(.red).bold()
             }
         }
         .padding()
